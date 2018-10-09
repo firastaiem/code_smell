@@ -17,69 +17,105 @@ public class Merge {
         new Merge().readAndWrite();
     }
 
-    public void readAndWrite(){
+    public void readAndWrite() {
         //read the input path
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
-        copy(new File(s),true);
+        copy(new File(s), true);
 
     }
 
-    public void copy(File fileToLoadOrig, boolean withDuplicate){
+    public void copy(File fileToLoadOrig, boolean withDuplicate) {
         //Let us get the current Date
         Date date = new Date();
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        int year  = localDate.getYear();
+        int year = localDate.getYear();
         int month = localDate.getMonthValue();
-        int day   = localDate.getDayOfMonth();
+        int day = localDate.getDayOfMonth();
 
-        String destDirectory = year + "-" + month + "-" + day;
+        String destDirectoryPath = year + "-" + month + "-" + day;
 
         //check if directory is created
 
-        File destFile = new File("./testing/dest/"+destDirectory);
-        System.out.println("the file path:"+ destFile.getAbsolutePath());
+        File destDirecoty = new File("./testing/dest/" + destDirectoryPath);
+        System.out.println("the file path:" + destDirecoty.getAbsolutePath());
 
-        if(! destFile.exists()){
-            System.out.println("creating a new directory with path:"+ destFile.getAbsolutePath());
-            boolean created = destFile.mkdirs();
-            System.out.println("is file created:"+created);
+        if (!destDirecoty.exists()) {
+            System.out.println("creating a new directory with path:" + destDirecoty.getAbsolutePath());
+            boolean created = destDirecoty.mkdirs();
+            System.out.println("is file created:" + created);
         }
-        System.out.println("File is created");
+        System.out.println("Directory is created");
         //Great, now let us check if the file already in the dirctory
 
-        File[] files = destFile.listFiles();
+
         boolean duplicateFound = false;
 
 
         File[] sourceFiles = fileToLoadOrig.listFiles();
 
-        for(File fileToLoad: sourceFiles) {
-            for (File file : files) {
-                if (file.getName().equals(fileToLoad.getName())) {
+        for (File sourceFile : sourceFiles) {
+            //let us get the file extension
+            String sourceFileType = "";
+            int location = sourceFile.getName().lastIndexOf('.');
+            if (location > 0) {
+                sourceFileType = sourceFile.getName().substring(location + 1);
+            }
+            //cool, let us go on
+            String nestedDirectory;
+            switch (sourceFileType) {
+                case "txt":
+                    nestedDirectory = "txt";
+                    break;
+                case "xls":
+                    nestedDirectory = "xls";
+                    break;
+                case "pdf":
+                    nestedDirectory = "pdf";
+                    break;
+                    default:
+                        nestedDirectory = "others";
+            }
+
+            //check if the type directory is created or not
+            File nestedDirecotyFile = new File(destDirecoty.getAbsolutePath()+"/" + nestedDirectory);
+            System.out.println("the file path:" + nestedDirecotyFile.getAbsolutePath());
+
+            if (!nestedDirecotyFile.exists()) {
+                System.out.println("creating a new directory with path:" + nestedDirecotyFile.getAbsolutePath());
+                boolean created = nestedDirecotyFile.mkdirs();
+                System.out.println("is file created:" + created);
+            }
+
+
+
+            File[] destinationFiles = nestedDirecotyFile.listFiles();
+
+            for (File destinationFile : destinationFiles) {
+                if (destinationFile.getName().equals(sourceFile.getName())) {
                     if (withDuplicate) {
                         int maxSeqNum = 0;
-                        //Let us find the last sequence of the file
-                        for (File fileForDuplicate : files) {
+                        //Let us find the last sequence of the destinationFile
+                        for (File fileForDuplicate : destinationFiles) {
                             String[] fileParts = fileForDuplicate.getName().split("_");
                             if (fileParts.length == 2) {
                                 //got a split
-                                if (fileParts[0].equals(file.getName())) {
+                                if (fileParts[0].equals(destinationFile.getName())) {
                                     maxSeqNum = Math.max(maxSeqNum, Integer.parseInt(fileParts[1]));
                                 }
                             }
                         }
-                        String newFilePath = fileToLoad.getName() + "_" + (maxSeqNum + 1);
+                        String newFilePath = sourceFile.getName() + "_" + (maxSeqNum + 1);
                         try {
-                            FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + newFilePath));
+                            FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + newFilePath));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     } else {
-                        // let us delete the file and replace it
-                        file.delete();
+                        // let us delete the destinationFile and replace it
+                        destinationFile.delete();
                         try {
-                            FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + fileToLoad.getName()));
+                            FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + sourceFile.getName()));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -87,7 +123,7 @@ public class Merge {
                     break;
                 } else {
                     try {
-                        FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + fileToLoad.getName()));
+                        FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + sourceFile.getName()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -95,85 +131,7 @@ public class Merge {
             }
 
             try {
-                FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + fileToLoad.getName()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    public void copy2(File fileToLoadOrig, boolean withDuplicate){
-        //Let us get the current Date
-        Date date = new Date();
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        int year  = localDate.getYear();
-        int month = localDate.getMonthValue();
-        int day   = localDate.getDayOfMonth();
-
-        String destDirectory = year + "-" + month + "-" + day;
-
-        //check if directory is created
-
-        File destFile = new File("./testing/dest/"+destDirectory);
-        System.out.println("the file path:"+ destFile.getAbsolutePath());
-
-        if(! destFile.exists()){
-            System.out.println("creating a new directory with path:"+ destFile.getAbsolutePath());
-            boolean created = destFile.mkdirs();
-            System.out.println("is file created:"+created);
-        }
-        System.out.println("File is created");
-        //Great, now let us check if the file already in the dirctory
-
-        File[] files = destFile.listFiles();
-        boolean duplicateFound = false;
-
-
-        File[] sourceFiles = fileToLoadOrig.listFiles();
-
-        for(File fileToLoad: sourceFiles) {
-            for (File file : files) {
-                if (file.getName().equals(fileToLoad.getName())) {
-                    if (withDuplicate) {
-                        int maxSeqNum = 0;
-                        //Let us find the last sequence of the file
-                        for (File fileForDuplicate : files) {
-                            String[] fileParts = fileForDuplicate.getName().split("_");
-                            if (fileParts.length == 2) {
-                                //got a split
-                                if (fileParts[0].equals(file.getName())) {
-                                    maxSeqNum = Math.max(maxSeqNum, Integer.parseInt(fileParts[1]));
-                                }
-                            }
-                        }
-                        String newFilePath = fileToLoad.getName() + "_" + (maxSeqNum + 1);
-                        try {
-                            FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + newFilePath));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        // let us delete the file and replace it
-                        file.delete();
-                        try {
-                            FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + fileToLoad.getName()));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-                } else {
-                    try {
-                        FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + fileToLoad.getName()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            try {
-                FileUtils.copyFile(fileToLoad, new File(destFile.getAbsoluteFile() + "/" + fileToLoad.getName()));
+                FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + sourceFile.getName()));
             } catch (IOException e) {
                 e.printStackTrace();
             }

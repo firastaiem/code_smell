@@ -40,7 +40,7 @@ public class MergeTest {
         int day   = localDate.getDayOfMonth();
 
         String destDirectory = year + "-" + month + "-" + day;
-        File destFile = new File("./testing/dest/"+destDirectory);
+        File destFile = new File("./testing/dest/"+destDirectory+"/txt");
 
         File file1 = new File(sourceDir.getPath() + "/file1.txt");
         try {
@@ -71,7 +71,7 @@ public class MergeTest {
         int day   = localDate.getDayOfMonth();
 
         String destDirectory = year + "-" + month + "-" + day;
-        File destFile = new File("./testing/dest/"+destDirectory);
+        File destFile = new File("./testing/dest/"+destDirectory+"/txt");
 
 
         File file1 = new File(sourceDir.getPath() + "/file1.txt");
