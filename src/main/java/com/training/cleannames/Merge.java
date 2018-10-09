@@ -67,12 +67,11 @@ public class Merge {
                 case "txt":
                     nestedDirectory = "txt";
                     break;
-                case "xls":
-                    nestedDirectory = "xls";
-                    break;
                 case "pdf":
                     nestedDirectory = "pdf";
                     break;
+                case "xls":
+                    nestedDirectory = "xls";
                     default:
                         nestedDirectory = "others";
             }
@@ -103,6 +102,8 @@ public class Merge {
                                 if (fileParts[0].equals(destinationFile.getName())) {
                                     maxSeqNum = Math.max(maxSeqNum, Integer.parseInt(fileParts[1]));
                                 }
+                            }else{
+                                new RuntimeException("Files were found with multiple _");
                             }
                         }
                         String newFilePath = sourceFile.getName() + "_" + (maxSeqNum + 1);
