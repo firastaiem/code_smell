@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static org.testng.Assert.*;
@@ -54,7 +55,7 @@ public class MergeTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        merge.copy(new File("./testing/test_source"),true);
+        merge.copy(new File("./testing/test_source"),true, new ArrayList<>());
         assertEquals(2,destFile.listFiles().length);
 
 
@@ -86,8 +87,8 @@ public class MergeTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        merge.copy(new File("./testing/test_source"),true);
-        merge.copy(new File("./testing/test_source"),true);
+        merge.copy(new File("./testing/test_source"),true, new ArrayList<>());
+        merge.copy(new File("./testing/test_source"),true, new ArrayList<>());
         assertEquals(4,destFile.listFiles().length);
 
     }

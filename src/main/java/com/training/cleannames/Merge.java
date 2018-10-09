@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -21,11 +23,14 @@ public class Merge {
         //read the input path
         Scanner scanner = new Scanner(System.in);
         String s = scanner.nextLine();
-        copy(new File(s), true);
+        List<String> passedFiles = new ArrayList<>();
+        copy(new File(s), true, passedFiles);
 
     }
 
-    public void copy(File fileToLoadOrig, boolean withDuplicate) {
+    //using for flag arguments should be avoided, and use another method instead
+    // passedFiles is ued to return values, it should not be used like that, and instead us the return type
+    public boolean copy(File fileToLoadOrig, boolean withDuplicate, List<String> passedFiles) {
         //Let us get the current Date
         Date date = new Date();
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -109,34 +114,43 @@ public class Merge {
                         String newFilePath = sourceFile.getName() + "_" + (maxSeqNum + 1);
                         try {
                             FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + newFilePath));
+                            passedFiles.add(sourceFile.getAbsolutePath());
                         } catch (IOException e) {
                             e.printStackTrace();
+                            return false;
                         }
                     } else {
                         // let us delete the destinationFile and replace it
                         destinationFile.delete();
                         try {
                             FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + sourceFile.getName()));
+                            passedFiles.add(sourceFile.getAbsolutePath());
                         } catch (IOException e) {
                             e.printStackTrace();
+                            return false;
                         }
                     }
                     break;
                 } else {
                     try {
                         FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + sourceFile.getName()));
+                        passedFiles.add(sourceFile.getAbsolutePath());
                     } catch (IOException e) {
                         e.printStackTrace();
+                        return false;
                     }
                 }
             }
 
             try {
                 FileUtils.copyFile(sourceFile, new File(nestedDirecotyFile.getAbsoluteFile() + "/" + sourceFile.getName()));
+                passedFiles.add(sourceFile.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
 
         }
+        return true;
     }
 }
